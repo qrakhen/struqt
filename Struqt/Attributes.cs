@@ -133,7 +133,7 @@ namespace Qrakhen.Struqt.Models
     {
         public bool value;
 
-        public CacheTable(bool value)
+        public CacheTable(bool value = true)
         {
             this.value = value;
         }
@@ -147,7 +147,7 @@ namespace Qrakhen.Struqt.Models
     {
         public string value;
 
-        public TableName(string value)
+        public TableName(string value = null)
         {
             this.value = value;
         }

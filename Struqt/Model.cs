@@ -377,7 +377,7 @@ namespace Qrakhen.Struqt.Models
         public static string getTableName(Type model)
         {
             var info = model.GetCustomAttribute<TableName>();
-            if (info == null) return model.Name.ToLower();
+            if (info == null || info.value == null) return model.Name.ToLower();
             else return info.value;
         }
     }
