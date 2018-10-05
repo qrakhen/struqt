@@ -195,7 +195,7 @@ namespace Qrakhen.Struqt.Models
         {
             __ard = true;
             foreach (var field in __def.fields.Values) {
-                var f = __t.GetField(field.name);
+                var f = getField(field.name);
                 if (f == null) throw new ModelDefinitionException("target type does not implement model field " + field.name);
                 this[field.name] = reader.read(field.column, field.type);
                 var _ref = field.reference;
@@ -231,10 +231,15 @@ namespace Qrakhen.Struqt.Models
             getField(name).SetValue(this, value);
         }
 
-        private FieldInfo getField(string name)
+        protected FieldInfo getField(string name)
         {
-            var field = __t.GetField(name, BindingFlags.NonPublic | BindingFlags.Instance);
-            if (field == null) field = __t.GetField(name);
+            return getField(__t, name);
+        }
+
+        protected static FieldInfo getField(Type type, string name)
+        {
+            var field = type.GetField(name, BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field == null) field = type.GetField(name);
             return field;
         }
 
