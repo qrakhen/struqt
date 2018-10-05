@@ -3,6 +3,9 @@
 #### A simple yet powerful database model system for .NET
 
 ## Example Usage:
+The repository contains a test-cli environment to play around with.
+If you don't want to read the following, clone & test the library!
+
 ### Defining Models:
 ```
 using Qrakhen.Struqt.Models;
