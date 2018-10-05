@@ -4,10 +4,9 @@ using System.Data.SqlClient;
 
 namespace Qrakhen.Struqt.Models
 {
-    public class Database
+    public sealed class Database
     {
         private static Dictionary<Type, Database> modelToDatabase = new Dictionary<Type, Database>();
-        public static Database defaultDatabase { get; private set; }
         private string connectionString;
         private string databaseName;
 
@@ -15,12 +14,6 @@ namespace Qrakhen.Struqt.Models
         {
             this.databaseName = databaseName;
             this.connectionString = connectionString;
-            if (defaultDatabase == null) setAsDefault();
-        }
-
-        public void setAsDefault()
-        {
-            defaultDatabase = this;
         }
 
         public void register(Type model)
@@ -34,16 +27,19 @@ namespace Qrakhen.Struqt.Models
             return new SqlConnection(connectionString);
         }
 
+        /// <summary>
+        /// Returns wheter given table exists on this database.
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
         public bool tableExists(string table)
         {
             var q = new Query.Count("INFORMATION_SCHEMA.TABLES");
             q.where(new Where.Equals("TABLE_NAME", table));
             return (count(q) > 0);
         }
-
-        public delegate T ReaderCallback<T>(RowReader reader);
-
-        public List<T> query<T>(Query query, ReaderCallback<T> callback)
+        
+        protected List<T> query<T>(Query query, RowReaderCallback<T> callback, bool firstOnly = false)
         {
             List<T> result = new List<T>();
             using (var sql = connect()) {
@@ -52,21 +48,49 @@ namespace Qrakhen.Struqt.Models
                     sql.Open();
                     using (var dr = cmd.ExecuteReader()) {
                         var reader = new RowReader(dr);
-                        while (dr.Read()) result.Add(callback(reader));
+                        while (dr.Read()) {
+                            result.Add(callback(reader));
+                            if (firstOnly) break;
+                        }
                     }
                 }
             }
             return result;
         }
 
-        public T queryFirst<T>(Query.Select query, ReaderCallback<T> callback)
+        /// <summary>
+        /// Returns all matched rows according to provided query, 
+        /// invoking the callback each row, which is required to return the desired object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        public List<T> query<T>(Query query, RowReaderCallback<T> callback)
         {
-            query.limit(1);
-            var result = query<T>(query, callback);
-            if (result.Count == 0) return default(T);
-            else return result[0];
+            return query<T>(query, callback);
         }
 
+        /// <summary>
+        /// Returns the first matched row according to provided query, 
+        /// invoking the callback, which is required to return the desired object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        public T queryFirst<T>(Query query, RowReaderCallback<T> callback)
+        {
+            var r = query<T>(query, callback, true);
+            if (r.Count == 0) return default(T);
+            else return r[0];
+        }
+
+        /// <summary>
+        /// Executes the provided count query and returns the (single) count result by reading the COUNT result.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public int count(Query.Count query)
         {
             int count = 0;
@@ -82,6 +106,11 @@ namespace Qrakhen.Struqt.Models
             return count;
         }
 
+        /// <summary>
+        /// Executes provided query and returns number of affected rows.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public int exec(Query query)
         {
             int rows = 0;
@@ -95,6 +124,12 @@ namespace Qrakhen.Struqt.Models
             return rows;
         }
 
+        /// <summary>
+        /// Executes provided query and returns the output column which is defined using Query.Insert.output();
+        /// This is commonly used for previously undefined IDs, to retrieve the new ID directly, without having to use another call.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public object scalar(Query.Insert query)
         {
             object result = null;

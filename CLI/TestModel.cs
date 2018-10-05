@@ -26,4 +26,10 @@ namespace Qrakhen.Struqt.CLI
 
         public string hiddenFromDb;
     }
+
+    [TableName("test_type")]
+    public class TestType : Model
+    {
+
+    }
 }

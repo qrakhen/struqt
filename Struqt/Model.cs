@@ -6,16 +6,44 @@ using System.Reflection;
 
 namespace Qrakhen.Struqt.Models
 {
+    /// <summary>
+    /// Pretty Cool class 'ere.
+    /// </summary>
     public abstract class Model
     {
-        public string __tableName {
-            get { return getTableName(GetType()); }
-        }
+        /// <summary>
+        /// (Internal) table name
+        /// </summary>
+        public string __tbl { get { return getTableName(GetType()); } }
 
-        protected Definition __def {
-            get { return Definition.get(GetType()); }
-        }
+        /// <summary>
+        /// Model.Definition, stores all database-relevant data.
+        /// </summary>
+        protected Definition __def { get { return Definition.get(GetType()); } }
 
+        /// <summary>
+        /// I need it way too often
+        /// </summary>
+        protected Type __t { get { return GetType(); } }
+
+        /// <summary>
+        /// Primary field
+        /// </summary>
+        protected Field __pf { get { return __def.primary; } }
+
+        /// <summary>
+        /// Primary field column name
+        /// </summary>
+        protected string __pfc { get { return __pf.column; } }
+
+        /// <summary>
+        /// Primary field member name
+        /// </summary>
+        protected string __pfn { get { return __pf.name; } }
+
+        /// <summary>
+        /// Shortcut to this model instance's database object.
+        /// </summary>
         protected Database __db {
             get {
                 var db = Database.getDatabase(GetType());
@@ -24,13 +52,12 @@ namespace Qrakhen.Struqt.Models
             }
         }
 
-        protected Type __t {
-            get { return GetType(); }
-        }
-
-        public void store() { save(); }
-        public void write() { save(); }
-        public virtual void save()
+        /// <summary>
+        /// Stores this object in the database.
+        /// Calls insert() to create a new entry if primaryField is undefined,
+        /// or else, update() will be called to overwrite the existing entry.
+        /// </summary>
+        public virtual void store()
         {
             if ((int)readField(__def.primary.name) == 0 || readField(__def.primary.name) == null) {
                 insert();
@@ -39,9 +66,12 @@ namespace Qrakhen.Struqt.Models
             }
         }
 
+        /// <summary>
+        /// Inserts this object's data into the table as a new row.
+        /// </summary>
         protected virtual void insert()
         {
-            var q = new Query.Insert(__tableName);
+            var q = new Query.Insert(__tbl);
             q.output(__def.primary.column);
             foreach (var field in __def.fields.Values) {
                 if (field.primary) continue;
@@ -51,10 +81,13 @@ namespace Qrakhen.Struqt.Models
             __t.GetField(__def.primary.name).SetValue(this, r);
         }
 
+        /// <summary>
+        /// Updates the existing entry within the table using the primaryField
+        /// </summary>
         protected virtual void update()
         {
             var q = new Query.Update(
-                __tableName, 
+                __tbl, 
                 new Where.Equals(
                     __def.primary.column, 
                     readField(__def.primary.name)));
@@ -70,7 +103,7 @@ namespace Qrakhen.Struqt.Models
         public virtual void delete()
         {
             var q = new Query.Update(
-                __tableName,
+                __tbl,
                 new Where.Equals(
                     __def.primary.column,
                     readField(__def.primary.name)));
@@ -103,7 +136,7 @@ namespace Qrakhen.Struqt.Models
         public static List<T> select<T>(Where where)
         {
             var db = Database.getDatabase(typeof(T));
-            return db.query<T>(
+            return db.query(
                 new Query.Select(getTableName(typeof(T))).where(where),
                 delegate(RowReader reader) {
                     T t = (T)Activator.CreateInstance(typeof(T));

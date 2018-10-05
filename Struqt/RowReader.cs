@@ -7,6 +7,28 @@ using System.Threading.Tasks;
 
 namespace Qrakhen.Struqt.Models
 {
+    /// <summary>
+    /// Callback that is used to read out rows as used by Database.query(query, callback);
+    /// </summary>
+    /// <example>
+    /// Example Usage:
+    /// 
+    /// List-Item- list = Database.query-Item-(
+    ///     new Query.Select(), 
+    ///     delegate(RowReader reader) {
+    ///         new Item(
+    ///             reader.readInt("id"),
+    ///             reader.readString("name"));
+    ///         });
+    /// </example>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="reader"></param>
+    /// <returns></returns>
+    public delegate T RowReaderCallback<T>(RowReader reader);
+
+    /// <summary>
+    /// Helper class that is provided together with the 
+    /// </summary>
     public class RowReader
     {
         private SqlDataReader dr;
