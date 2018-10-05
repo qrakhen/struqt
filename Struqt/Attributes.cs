@@ -121,6 +121,20 @@ namespace Qrakhen.Struqt.Models
     }
 
     /// <summary>
+    /// Wether this table shall be cached during runtime.
+    /// Default: false
+    /// </summary>
+    public sealed class CacheTable : TableAttributeBase
+    {
+        public bool value;
+
+        public CacheTable(bool value)
+        {
+            this.value = value;
+        }
+    }
+
+    /// <summary>
     /// Defines the table name for this model.
     /// Default: class name in lowercase.
     /// </summary>

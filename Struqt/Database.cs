@@ -58,6 +58,11 @@ namespace Qrakhen.Struqt.Models
             return result;
         }
 
+        private List<Model> query(Query query, RowReaderCallback<Model> callback, bool firstOnly = false)
+        {
+            return query<Model>(query, callback);
+        }
+
         /// <summary>
         /// Returns all matched rows according to provided query, 
         /// invoking the callback each row, which is required to return the desired object.
@@ -72,6 +77,19 @@ namespace Qrakhen.Struqt.Models
         }
 
         /// <summary>
+        /// Returns all matched rows according to provided query, 
+        /// invoking the callback each row, which is required to return the desired object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        public List<Model> query(Query query, RowReaderCallback<Model> callback)
+        {
+            return this.query(query, callback);
+        }
+
+        /// <summary>
         /// Returns the first matched row according to provided query, 
         /// invoking the callback, which is required to return the desired object.
         /// </summary>
@@ -79,11 +97,24 @@ namespace Qrakhen.Struqt.Models
         /// <param name="query"></param>
         /// <param name="callback"></param>
         /// <returns></returns>
-        public T queryFirst<T>(Query query, RowReaderCallback<T> callback)
+        public T getFirst<T>(Query query, RowReaderCallback<T> callback)
         {
             var r = query<T>(query, callback, true);
             if (r.Count == 0) return default(T);
             else return r[0];
+        }
+
+        /// <summary>
+        /// Returns the first matched row according to provided query, 
+        /// invoking the callback, which is required to return the desired object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        public Model getFirst(Query query, RowReaderCallback<Model> callback)
+        {
+            return getFirst<Model>(query, callback);
         }
 
         /// <summary>

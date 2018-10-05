@@ -26,6 +26,8 @@ namespace Qrakhen.Struqt.CLI
 
             tt.store();
 
+            TestType tst = Model.getByPrimary<TestType>(6);
+
             tm.store();
 
             Console.ReadLine();

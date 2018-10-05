@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes.cs" />
+    <Compile Include="Cache.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="ExtendedTypes.cs" />
     <Compile Include="Queries.cs" />
