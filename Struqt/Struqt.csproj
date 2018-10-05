@@ -42,7 +42,9 @@
   <ItemGroup>
     <Compile Include="Attributes.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="ExtendedTypes.cs" />
     <Compile Include="Queries.cs" />
+    <Compile Include="RowWriter.cs" />
     <Compile Include="RowReader.cs" />
     <Compile Include="Where.cs" />
     <Compile Include="Model.cs" />

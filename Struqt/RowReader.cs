@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Qrakhen.Struqt.ExtendedTypes;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -38,6 +39,8 @@ namespace Qrakhen.Struqt.Models
             this.dr = dr;
         }
 
+        private static readonly DateTime DT_MIN_VALUE = Convert.ToDateTime("1955-01-01 00:00:00.000");
+
         public object read(string column, Type fieldType)
         {
             if (fieldType == typeof(DateTime)) return readDateTime(column);
@@ -47,15 +50,16 @@ namespace Qrakhen.Struqt.Models
             if (fieldType == typeof(short)) return readShort(column);
             if (fieldType == typeof(string)) return readString(column);
             if (fieldType == typeof(Guid)) return new Guid(readString(column));
+            if (fieldType.IsEnum) return Enum.ToObject(fieldType, readInt(column));
             throw new NotImplementedException("implement " + fieldType.Name + " for fucks sake!");
         }
 
-        public DateTime readDateTime(string column)
+        public NDateTime readDateTime(string column)
         {
             if (!dr.IsDBNull(dr.GetOrdinal(column)))
-                return dr.GetDateTime(dr.GetOrdinal(column));
+                return new NDateTime(dr.GetDateTime(dr.GetOrdinal(column)));
             else
-                return DateTime.MinValue;
+                return null;
         }
 
         public bool readBool(string column, bool fallBack = false)

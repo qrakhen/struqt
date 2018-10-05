@@ -9,7 +9,7 @@ namespace Qrakhen.Struqt.Models
     /// If you want to implement an n:m model, 
     /// use the PolyReference Attribute for the desired model.
     /// </summary>
-    public class Reference : ColumnAttributeAbstract
+    public sealed class Reference : ColumnAttributeBase
     {
         public Type model;
         public string field;
@@ -33,7 +33,7 @@ namespace Qrakhen.Struqt.Models
     /// Wheter this column is nullable.
     /// Default: true
     /// </summary>
-    public class Null : ColumnAttributeAbstract
+    public sealed class Null : ColumnAttributeBase
     {
         public bool value;
 
@@ -44,9 +44,23 @@ namespace Qrakhen.Struqt.Models
     }
 
     /// <summary>
-    /// Defines the primary column.
+    /// Defines the primary key column.
+    /// Does the same as Column("name"), just saving a few lines, conviently.
     /// </summary>
-    public class Primary : ColumnAttributeAbstract
+    public sealed class Primary : ColumnAttributeBase
+    {
+        public string value;
+
+        public Primary(string value = null)
+        {
+            this.value = value;
+        }
+    }
+
+    /// <summary>
+    /// Indexes the column.
+    /// </summary>
+    public sealed class Index : ColumnAttributeBase
     {
         public bool value = true;
     }
@@ -54,15 +68,7 @@ namespace Qrakhen.Struqt.Models
     /// <summary>
     /// Indexes the column.
     /// </summary>
-    public class Index : ColumnAttributeAbstract
-    {
-        public bool value = true;
-    }
-
-    /// <summary>
-    /// Indexes the column.
-    /// </summary>
-    public class AutoIncrement : ColumnAttributeAbstract
+    public sealed class AutoIncrement : ColumnAttributeBase
     {
         public bool value = true;
     }
@@ -72,7 +78,7 @@ namespace Qrakhen.Struqt.Models
     /// Also defines the column's name.
     /// Default: member name in lowercase.
     /// </summary>
-    public class Column : ColumnAttributeAbstract
+    public sealed class Column : ColumnAttributeBase
     {
         public string value;
 
@@ -85,7 +91,7 @@ namespace Qrakhen.Struqt.Models
     /// <summary>
     /// I'm not even sure atm.
     /// </summary>
-    public class PolyReference : TableAttributeAbstract
+    public sealed class PolyReference : TableAttributeBase
     {
         public string value;
 
@@ -99,7 +105,7 @@ namespace Qrakhen.Struqt.Models
     /// Defines the table name for this model.
     /// Default: class name in lowercase.
     /// </summary>
-    public class TableName : TableAttributeAbstract
+    public sealed class TableName : TableAttributeBase
     {
         public string value;
 
@@ -109,11 +115,7 @@ namespace Qrakhen.Struqt.Models
         }
     }
 
-    public class TableAttributeAbstract : Attribute
-    {
-    }
+    public abstract class TableAttributeBase : Attribute { }
 
-    public class ColumnAttributeAbstract : Attribute
-    {
-    }
+    public abstract class ColumnAttributeBase : Attribute { }
 }

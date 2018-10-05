@@ -14,34 +14,25 @@ namespace Qrakhen.Struqt.CLI
             Database db = new Database("struqt", "Data Source=localhost;Initial Catalog=struqt;Integrated Security=SSPI;Trusted_Connection=true;MultipleActiveResultSets=true");
 
             db.register(typeof(TestModel));
-            
-            var sql = new Query.Select("myTable")
-                    .limit(10)
-                    .sort("id", System.Data.SqlClient.SortOrder.Ascending)
-                    .addArgument("myTable", "table123")
-                    .where(
-                        new Where.Equals("id", 1)
-                        .and(new Where.Equals("name", "stefan"))
-                        .and(new Where.Equals("i", 3.242f)));
+            db.register(typeof(TestType));
 
-            //Console.WriteLine(sql.build());
-
-            TestModel m = new TestModel {
-                enabled = true,
-                hiddenFromDb = "yes",
+            TestModel tm = new TestModel {
                 name = "dave",
-                dt = DateTime.Now,
-                guid = Guid.NewGuid()
+                enabled = true,
+                type_id = 5
             };
 
-            m.store();
+            TestType tt = new TestType {
+                id = 5,
+                name = "5er-Typ",
+                price = 49.95m,
+                sort = TestType.Sort.Smoo
+            };
 
-            var r = Model.select<TestModel>(new Where.Equals("id", 1));
+            tt.store();
 
-            r[0].name = "King of da hill!";
-            r[0].store();
+            tm.store();
 
-            Console.WriteLine(sql.build());
             Console.ReadLine();
         }
     }

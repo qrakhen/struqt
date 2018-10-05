@@ -1,4 +1,5 @@
-﻿using Qrakhen.Struqt.Models;
+﻿using Qrakhen.Struqt.ExtendedTypes;
+using Qrakhen.Struqt.Models;
 using System;
 
 namespace Qrakhen.Struqt.CLI
@@ -8,7 +9,6 @@ namespace Qrakhen.Struqt.CLI
     {
         [Primary]
         [AutoIncrement]
-        [Column]
         public int id;
 
         [Column]
@@ -22,14 +22,37 @@ namespace Qrakhen.Struqt.CLI
         public bool enabled;
 
         [Column("dt")]
-        public DateTime dt;
+        public NDateTime dt;
 
-        public string hiddenFromDb;
+        [Column]
+        [Reference(typeof(TestModel), "id", "type_container")]
+        public int type_id;
+
+        public TestType type_container;
     }
 
     [TableName("test_type")]
     public class TestType : Model
     {
+        public enum Sort
+        {
+            Cool = 0,
+            Smoo = 1,
+            Whoo = 2,
+            Foou = 3
+        }
 
+        [Primary]
+        [AutoIncrement]
+        public int id;
+
+        [Column]
+        public string name;
+
+        [Column]
+        public decimal price;
+
+        [Column]
+        public Sort sort;
     }
 }

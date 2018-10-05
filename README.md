@@ -61,6 +61,43 @@ Player p = Player.select<Player>(new Where.Equals("playerName", "qrakhen"))[0];
 So much for the basic usage.
 It's easy, isn't it?
 
+### Using Foreign Reference Fields
+
+Easy going, my friends.
+
+```csharp
+[TableName("person")]
+class Person : Model
+{
+    [Primary]
+    public int id;
+
+    [Column]
+    // what this does now, is declare this field to be a reference to another model.
+    // first parameter is the model type, second is the referenced column,
+    // and the third parameter is optional. it defines the container, into which
+    // the reference should be read into automatically when reading this entry.    
+    [Reference(typeof(PersonType), "id", "person_type")] 
+    public int type_id;
+
+    public PersonType person_type;
+}
+
+[TableName("person_type")]
+class PersonType : Model
+{
+    [Primary]
+    public int id;
+
+    public string name;
+
+    public int number = new Random().Next(128);
+}
+```
+This is the basic setup in terms of declaring models & structure.
+
+If you provided a container field, the model will automatically instantiate a type of target model and assign it to that field.
+
 ### Using Queries and Complex Selects
 This feature isn't fully done yet, but will follow shorty.
 Here are some tricks that work already:

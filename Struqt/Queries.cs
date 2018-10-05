@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Qrakhen.Struqt.Models
 {
@@ -50,8 +47,7 @@ namespace Qrakhen.Struqt.Models
             return " WHERE " + _where.print();
         }
 
-        public abstract string build();
-        
+        public abstract string build();        
 
         public class Plain : Query
         {
@@ -147,7 +143,7 @@ namespace Qrakhen.Struqt.Models
                 if (values.Count < 1) throw new InvalidOperationException("no values provided to update query");
                 string q = "UPDATE " + _table + " SET ";
                 foreach (var value in values) {
-                    q += value.Key + "=" + value.Value + ",";
+                    q += "[" + value.Key + "]=" + value.Value + ",";
                 }
                 q = q.Substring(0, q.Length - 1);
                 q += buildWhere();
@@ -177,7 +173,7 @@ namespace Qrakhen.Struqt.Models
             public Insert addValue(string column, object value)
             {
                 values.Add(column, "@" + column);
-                addArgument("@" + column, value);
+                addArgument("@" + column, (value == null ? DBNull.Value : value));
                 return this;
             }
 
@@ -186,7 +182,7 @@ namespace Qrakhen.Struqt.Models
                 if (values.Count < 1) throw new InvalidOperationException("no values provided to insert query");
                 string q = "INSERT INTO " + _table + " (";
                 foreach (var value in values) {
-                    q += value.Key + ",";
+                    q += "[" + value.Key + "],";
                 }
                 q = q.Substring(0, q.Length - 1);
                 q += ") ";
@@ -218,6 +214,37 @@ namespace Qrakhen.Struqt.Models
                 if (_where == null) throw new InvalidOperationException("no WHERE conditions for rows to be deleted were specified");
                 string q = "DELETE FROM " + _table + " ";
                 q += buildWhere();
+                return q;
+            }
+        }
+
+        public class Create : Query
+        {
+            protected Type model;
+
+            public Create(string table, Type model) : base(table)
+            {
+                this.model = model;
+            }
+
+            public sealed override string build()
+            {
+                var def = Model.Definition.get(model);
+                string primary = null;
+                string q = "CREATE TABLE " + def.tableName + "(";
+                foreach (var field in def.fields.Values) {
+                    if (field.primary)
+                        if (primary == null) primary = field.column;
+                        else throw new ModelDefinitionException("multiple primary keys defined in " + def.tableName);
+                    q += field.column + " ";
+                    q += Model.Field.getSqlType(field.type) + " ";
+                    q += field.nullable ? "NULL" : "NOT NULL";
+                    if (field.increment) q += " IDENTITY(1,1)";
+                    q += ",";
+                }
+                if (primary == null) throw new ModelDefinitionException("no primary key defined for " + def.tableName);
+                q += "primary key (" + primary + ")";
+                q += ");";
                 return q;
             }
         }

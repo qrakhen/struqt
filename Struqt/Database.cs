@@ -39,7 +39,7 @@ namespace Qrakhen.Struqt.Models
             return (count(q) > 0);
         }
         
-        protected List<T> query<T>(Query query, RowReaderCallback<T> callback, bool firstOnly = false)
+        private List<T> query<T>(Query query, RowReaderCallback<T> callback, bool firstOnly = false)
         {
             List<T> result = new List<T>();
             using (var sql = connect()) {
