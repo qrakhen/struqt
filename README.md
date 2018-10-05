@@ -4,10 +4,11 @@
 
 ## Example Usage:
 The repository contains a test-cli environment to play around with.
+
 If you don't want to read the following, clone & test the library!
 
 ### Defining Models:
-```
+```csharp
 using Qrakhen.Struqt.Models;
 
 [TableName("player")]
@@ -36,7 +37,7 @@ And that's it!
 Yes, really. All you need to do is register your model, and you're good to go!
 
 ### Using Models
-```
+```csharp
 Database db = new Database("myDatabase", "connectionString");
 
 // register the model to a database, so it knows where it belongs to.
@@ -63,7 +64,7 @@ It's easy, isn't it?
 ### Using Queries and Complex Selects
 This feature isn't fully done yet, but will follow shorty.
 Here are some tricks that work already:
-```
+```csharp
 var select = new Query.Select("player");
 select
     .limit(12)
@@ -92,6 +93,7 @@ var result = db.select<SomeModel>(
 
 ### Credits
 This Library was solely made using .NET's System[.Data] and that's it.
+
 Copying, modifying, and redistributing is permitted.
 
 #### Author
