@@ -1,8 +1,6 @@
 ﻿using Qrakhen.Struqt.ExtendedTypes;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Data.SqlTypes;
 using System.Reflection;
 
 namespace Qrakhen.Struqt.Models
@@ -41,6 +39,11 @@ namespace Qrakhen.Struqt.Models
         /// Primary field member name
         /// </summary>
         protected string __pfn { get { return __pf.name; } }
+
+        /// <summary>
+        /// Security bool
+        /// </summary>
+        private bool __ard = false;
 
         /// <summary>
         /// Quick access to field reading/writing
@@ -112,7 +115,8 @@ namespace Qrakhen.Struqt.Models
             if ((int)readField(__def.primary.name) == 0 || readField(__def.primary.name) == null) {
                 insert();
             } else {
-                update();
+                if (__ard) update();
+                else throw new ModelReadWriteException(this, "you can not update an entry that received its primary key before first write. if you want to do this, remove [AutoIncrement] from the model definition and manage ID counting externaly.");
             }
         }
 
@@ -145,7 +149,6 @@ namespace Qrakhen.Struqt.Models
                 if (field.primary && !overwritePrimaryKey) continue;
                 q.addValue(field.column, RowWriter.write(field.type, readField(field.name)));
             }
-            __db.exec(q);
         }
 
         /// <summary>
@@ -163,13 +166,15 @@ namespace Qrakhen.Struqt.Models
         /// <param name="reader"></param>
         protected virtual void readRow(RowReader reader)
         {
+            __ard = true;
             foreach (var field in __def.fields.Values) {
                 var f = __t.GetField(field.name);
                 if (f == null) throw new ModelDefinitionException("target type does not implement model field " + field.name);
                 writeField(f.Name, reader.read(field.column, field.type));
                 var _ref = field.reference;
                 if (_ref != null && _ref.container != null) {
-                    var _obj = Activator.CreateInstance(_ref.model);
+                    /* probably the ugliest line of code i made yet */
+                    var _obj = typeof(Model).GetMethod("getByPrimary").MakeGenericMethod(_ref.model).Invoke(null, new object[] { readField(field.name) });
                     writeField(_ref.container, _obj);
                 }
             }
@@ -238,9 +243,10 @@ namespace Qrakhen.Struqt.Models
             public string column;
             public Type type;
             public bool nullable = true;
+            public bool unique = false;
             public bool primary = false;
-            public bool indexed = false;
             public bool increment = false;
+            public string indexed = null;
             public Reference reference = null;
 
             public Field(FieldInfo field)
@@ -263,7 +269,14 @@ namespace Qrakhen.Struqt.Models
                 } else {
                     var _nullable = field.GetCustomAttribute<Null>();
                     if (_nullable != null) nullable = _nullable.value;
+                    else {
+                        var _notnullable = field.GetCustomAttribute<NotNull>();
+                        if (_notnullable != null) nullable = _notnullable.value;
+                    }
                 }
+
+                var _unique = field.GetCustomAttribute<Unique>();
+                if (_unique != null) unique = _unique.value;
 
                 var _indexed = field.GetCustomAttribute<Index>();
                 if (_indexed != null) indexed = _indexed.value;
@@ -303,6 +316,11 @@ namespace Qrakhen.Struqt.Models
             }
         }
 
+        /// <summary>
+        /// Returns the table name for the provided model type.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public static string getTableName(Type model)
         {
             var info = model.GetCustomAttribute<TableName>();
@@ -311,7 +329,15 @@ namespace Qrakhen.Struqt.Models
         }
     }
 
-    public class StampModel : Model { }
+    public class ModelReadWriteException : ModelException
+    {
+        public Model entry;
+
+        public ModelReadWriteException(Model entry, string message) : base(message)
+        {
+            this.entry = entry;
+        }
+    }
 
     public class ModelDefinitionException : ModelException
     {

@@ -16,6 +16,7 @@ namespace Qrakhen.Struqt.CLI
         
         [Null(true)]
         [Column]
+        [Unique]
         public string name;
 
         [Column("alive")]
@@ -25,7 +26,7 @@ namespace Qrakhen.Struqt.CLI
         public NDateTime dt;
 
         [Column]
-        [Reference(typeof(TestModel), "id", "type_container")]
+        [Reference(typeof(TestType), "type_container")]
         public int type_id;
 
         public TestType type_container;

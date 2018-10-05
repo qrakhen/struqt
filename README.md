@@ -58,6 +58,7 @@ p.store();
 // retrieve the player again by using the model's built in select function
 Player p = Player.select<Player>(new Where.Equals("playerName", "qrakhen"))[0];
 ```
+
 So much for the basic usage.
 It's easy, isn't it?
 

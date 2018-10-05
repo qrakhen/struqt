@@ -43,11 +43,14 @@ namespace Qrakhen.Struqt.Models
 
         public object read(string column, Type fieldType)
         {
+            if (fieldType == typeof(NDateTime)) return readDateTime(column);
             if (fieldType == typeof(DateTime)) return readDateTime(column);
             if (fieldType == typeof(bool)) return readBool(column);
             if (fieldType == typeof(long)) return readLong(column);
             if (fieldType == typeof(int)) return readInt(column);
             if (fieldType == typeof(short)) return readShort(column);
+            if (fieldType == typeof(float)) return readFloat(column);
+            if (fieldType == typeof(decimal)) return readDecimal(column);
             if (fieldType == typeof(string)) return readString(column);
             if (fieldType == typeof(Guid)) return new Guid(readString(column));
             if (fieldType.IsEnum) return Enum.ToObject(fieldType, readInt(column));
@@ -90,6 +93,22 @@ namespace Qrakhen.Struqt.Models
         {
             if (!dr.IsDBNull(dr.GetOrdinal(column)))
                 return dr.GetInt16(dr.GetOrdinal(column));
+            else
+                return fallBack;
+        }
+
+        public float readFloat(string column, float fallBack = 0f)
+        {
+            if (!dr.IsDBNull(dr.GetOrdinal(column)))
+                return dr.GetFloat(dr.GetOrdinal(column));
+            else
+                return fallBack;
+        }
+
+        public decimal readDecimal(string column, decimal fallBack = 0m)
+        {
+            if (!dr.IsDBNull(dr.GetOrdinal(column)))
+                return dr.GetDecimal(dr.GetOrdinal(column));
             else
                 return fallBack;
         }

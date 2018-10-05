@@ -16,14 +16,9 @@ namespace Qrakhen.Struqt.CLI
             db.register(typeof(TestModel));
             db.register(typeof(TestType));
 
-            TestModel tm = new TestModel {
-                name = "dave",
-                enabled = true,
-                type_id = 5
-            };
+            TestModel tm = Model.getByPrimary<TestModel>(5);
 
             TestType tt = new TestType {
-                id = 5,
                 name = "5er-Typ",
                 price = 49.95m,
                 sort = TestType.Sort.Smoo

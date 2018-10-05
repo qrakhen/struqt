@@ -238,12 +238,14 @@ namespace Qrakhen.Struqt.Models
                         else throw new ModelDefinitionException("multiple primary keys defined in " + def.tableName);
                     q += field.column + " ";
                     q += Model.Field.getSqlType(field.type) + " ";
+                    if (field.unique) q += "UNIQUE ";
+                    if (field.indexed != null) q += "INDEX " + field.indexed + " ";
                     q += field.nullable ? "NULL" : "NOT NULL";
                     if (field.increment) q += " IDENTITY(1,1)";
                     q += ",";
                 }
                 if (primary == null) throw new ModelDefinitionException("no primary key defined for " + def.tableName);
-                q += "primary key (" + primary + ")";
+                q += "PRIMARY KEY (" + primary + ")";
                 q += ");";
                 return q;
             }

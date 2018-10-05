@@ -21,19 +21,28 @@ namespace Qrakhen.Struqt.Models
         /// <param name="model">The target model this reference points to</param>
         /// <param name="field">The target field name of referenced model. NOT! the column name</param>
         /// <param name="container">The local container field to store referenced object. Can be null, if item should not be read automatically.</param>
-        public Reference(Type model, string field, string container = null)
+        public Reference(Type model, /*string field, */string container = null)
         {
             this.model = model;
-            this.field = field;
+            //this.field = field;
             this.container = container;
         }
+    }
+
+    /// <summary>
+    /// Wheter this column is unique.
+    /// Default: true
+    /// </summary>
+    public sealed class Unique : ColumnAttributeBase
+    {
+        public bool value = true;
     }
 
     /// <summary>
     /// Wheter this column is nullable.
     /// Default: true
     /// </summary>
-    public sealed class Null : ColumnAttributeBase
+    public class Null : ColumnAttributeBase
     {
         public bool value;
 
@@ -41,6 +50,11 @@ namespace Qrakhen.Struqt.Models
         {
             this.value = value;
         }
+    }
+
+    public sealed class NotNull : Null
+    {
+        public NotNull() : base(false) { }
     }
 
     /// <summary>
@@ -62,7 +76,12 @@ namespace Qrakhen.Struqt.Models
     /// </summary>
     public sealed class Index : ColumnAttributeBase
     {
-        public bool value = true;
+        public string value;
+
+        public Index(string value = "SELF")
+        {
+            this.value = value;
+        }
     }
 
     /// <summary>
