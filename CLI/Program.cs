@@ -26,18 +26,20 @@ namespace Qrakhen.Struqt.CLI
 
             //Console.WriteLine(sql.build());
 
-            /*TestModel m = new TestModel {
+            TestModel m = new TestModel {
                 enabled = true,
                 hiddenFromDb = "yes",
                 name = "dave",
                 dt = DateTime.Now,
                 guid = Guid.NewGuid()
-            };*/
+            };
 
-            var m = TestModel.select<TestModel>(new Where.Equals("id", 2));
+            m.store();
 
-            m[0].name = "King of da hill!";
-            m[0].store();
+            var r = Model.select<TestModel>(new Where.Equals("id", 1));
+
+            r[0].name = "King of da hill!";
+            r[0].store();
 
             Console.WriteLine(sql.build());
             Console.ReadLine();

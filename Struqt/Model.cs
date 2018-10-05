@@ -28,7 +28,9 @@ namespace Qrakhen.Struqt.Models
             get { return GetType(); }
         }
 
-        public virtual void store()
+        public void store() { save(); }
+        public void write() { save(); }
+        public virtual void save()
         {
             if ((int)readField(__def.primary.name) == 0 || readField(__def.primary.name) == null) {
                 insert();
@@ -63,9 +65,20 @@ namespace Qrakhen.Struqt.Models
             __db.exec(q);
         }
 
-        public virtual void erase()
+        public void erase() { delete(); }
+        public void remove() { delete(); }
+        public virtual void delete()
         {
-
+            var q = new Query.Update(
+                __tableName,
+                new Where.Equals(
+                    __def.primary.column,
+                    readField(__def.primary.name)));
+                foreach (var field in __def.fields.Values) {
+                    if (field.primary) continue;
+                    q.addValue(field.column, readField(field.name));
+                }
+            __db.exec(q);
         }
 
         protected virtual void readRow(RowReader reader)

@@ -23,7 +23,6 @@ namespace Qrakhen.Struqt.Models
             defaultDatabase = this;
         }
 
-
         public void register(Type model)
         {
             modelToDatabase.Add(model, this);

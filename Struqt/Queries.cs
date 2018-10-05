@@ -96,7 +96,7 @@ namespace Qrakhen.Struqt.Models
                 return " ORDER BY " + sortColumn + " " + (sortOrder == SortOrder.Ascending ? "ASC" : "DESC");
             }
 
-            public override string build()
+            public override sealed string build()
             {
                 string q = "SELECT ";
                 if (_limit > 0) q += "TOP (" + _limit + ")";
@@ -113,7 +113,7 @@ namespace Qrakhen.Struqt.Models
             public Count() : base() { }
             public Count(string table) : base(table) { }
 
-            public override string build()
+            public override sealed string build()
             {
                 string q = "SELECT COUNT(*) AS 'count' ";
                 q += " FROM " + _table + " ";
@@ -141,9 +141,10 @@ namespace Qrakhen.Struqt.Models
                 return this;
             }
 
-            public override string build()
+            public override sealed string build()
             {
-                if (values.Count < 1) throw new InvalidOperationException("no values provided to insert query");
+                if (_where == null) throw new InvalidOperationException("no WHERE conditions for rows to be updated were specified");
+                if (values.Count < 1) throw new InvalidOperationException("no values provided to update query");
                 string q = "UPDATE " + _table + " SET ";
                 foreach (var value in values) {
                     q += value.Key + "=" + value.Value + ",";
@@ -180,7 +181,7 @@ namespace Qrakhen.Struqt.Models
                 return this;
             }
 
-            public override string build()
+            public override sealed string build()
             {
                 if (values.Count < 1) throw new InvalidOperationException("no values provided to insert query");
                 string q = "INSERT INTO " + _table + " (";
@@ -196,6 +197,27 @@ namespace Qrakhen.Struqt.Models
                 }
                 q = q.Substring(0, q.Length - 1);
                 q += ")";
+                return q;
+            }
+        }
+
+        public class Delete : Query
+        {
+            public Delete(Where where) : base()
+            {
+                this.where(where);
+            }
+
+            public Delete(string table, Where where) : base(table)
+            {
+                this.where(where);
+            }
+
+            public override sealed string build()
+            {
+                if (_where == null) throw new InvalidOperationException("no WHERE conditions for rows to be deleted were specified");
+                string q = "DELETE FROM " + _table + " ";
+                q += buildWhere();
                 return q;
             }
         }
