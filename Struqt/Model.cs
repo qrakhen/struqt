@@ -85,6 +85,19 @@ namespace Qrakhen.Struqt.Models
                 });
         }
 
+        public static List<T> select<T>(Query query)
+        {
+            var mt = typeof(T);
+            var db = Database.getDatabase(mt);
+            return db.query(
+                query,
+                delegate (RowReader reader) {
+                    var e = (Model)Activator.CreateInstance(mt);
+                    e.readRow(reader);
+                    return (T)(object)e;
+                });
+        }
+
         /// <summary>
         /// Selects the first object matching the provided Where-Clause
         /// </summary>
@@ -132,7 +145,7 @@ namespace Qrakhen.Struqt.Models
 
         public static List<T> getChildren<T>(Type relation, Where where)
         {
-            return select<T>(null);
+            return null;
         }
 
         /// <summary>
@@ -142,7 +155,12 @@ namespace Qrakhen.Struqt.Models
         /// </summary>
         public virtual void store()
         {
-            if ((int)this[__pkyn] == 0 || this[__pkyn] == null) {
+            var t = getField(__pkyn).FieldType;
+            bool d = false;
+            if (t == typeof(string)) d = true;
+            else if ((int)this[__pkyn] == 0) d = true;
+            
+            if (d) {
                 insert();
             } else {
                 if (__ard) update();
@@ -197,7 +215,9 @@ namespace Qrakhen.Struqt.Models
             foreach (var field in __def.fields.Values) {
                 var f = getField(field.name);
                 if (f == null) throw new ModelDefinitionException("target type does not implement model field " + field.name);
-                this[field.name] = reader.read(field.column, field.type);
+                var v = reader.read(field.column, field.type);
+                if (v != null && v.GetType() == typeof(NDateTime)) v = (v as NDateTime).dt;
+                this[field.name] = v;
                 var _ref = field.reference;
                 if (_ref != null && _ref.container != null) {
                     var _obj = typeof(Model)

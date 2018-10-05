@@ -58,11 +58,6 @@ namespace Qrakhen.Struqt.Models
             return result;
         }
 
-        private List<Model> query(Query query, RowReaderCallback<Model> callback, bool firstOnly = false)
-        {
-            return query<Model>(query, callback);
-        }
-
         /// <summary>
         /// Returns all matched rows according to provided query, 
         /// invoking the callback each row, which is required to return the desired object.
@@ -73,20 +68,7 @@ namespace Qrakhen.Struqt.Models
         /// <returns></returns>
         public List<T> query<T>(Query query, RowReaderCallback<T> callback)
         {
-            return query<T>(query, callback);
-        }
-
-        /// <summary>
-        /// Returns all matched rows according to provided query, 
-        /// invoking the callback each row, which is required to return the desired object.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="callback"></param>
-        /// <returns></returns>
-        public List<Model> query(Query query, RowReaderCallback<Model> callback)
-        {
-            return this.query(query, callback);
+            return query<T>(query, callback, false);
         }
 
         /// <summary>
@@ -179,7 +161,7 @@ namespace Qrakhen.Struqt.Models
             return "USE " + databaseName + "; " + str;
         }
 
-        internal static Database getDatabase(Type model)
+        public static Database getDatabase(Type model)
         {
             if (modelToDatabase.ContainsKey(model)) return modelToDatabase[model];
             else return null;
