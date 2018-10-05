@@ -16,19 +16,15 @@ namespace Qrakhen.Struqt.CLI
             db.register(typeof(TestModel));
             db.register(typeof(TestType));
 
-            TestModel tm = Model.getByPrimary<TestModel>(5);
-
             TestType tt = new TestType {
-                name = "5er-Typ",
-                price = 49.95m,
                 sort = TestType.Sort.Smoo
             };
 
             tt.store();
+            
+            TestModel tm = Model.getByPrimary<TestModel>(2);
 
-            TestType tst = Model.getByPrimary<TestType>(6);
-
-            tm.store();
+            tm?.store();
 
             Console.ReadLine();
         }

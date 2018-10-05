@@ -29,6 +29,7 @@ namespace Qrakhen.Struqt.Models
 
         public Query where(Where where)
         {
+            if (where == null) return this;
             _where = where;
             addArgument("@" + where.column, where.value);
             foreach (var w in where.parts) addArgument("@" + w.column, w.value);

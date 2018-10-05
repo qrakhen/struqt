@@ -12,21 +12,25 @@ namespace Qrakhen.Struqt.CLI
         public int id;
 
         [Column]
-        public Guid guid;
+        [NotNull]
+        public Guid guid = Guid.NewGuid();
         
         [Null(true)]
         [Column]
-        [Unique]
         public string name;
 
         [Column("alive")]
         public bool enabled;
 
+        [Column]
+        [Unique]
+        private int __top_secret;
+
         [Column("dt")]
         public NDateTime dt;
 
         [Column]
-        [Reference(typeof(TestType), "type_container")]
+        [Reference(typeof(TestType), "sort", "type_container")]
         public int type_id;
 
         public TestType type_container;
@@ -48,10 +52,10 @@ namespace Qrakhen.Struqt.CLI
         public int id;
 
         [Column]
-        public string name;
+        private string name = "private";
 
         [Column]
-        public decimal price;
+        protected decimal price = 75073237.369842m;
 
         [Column]
         public Sort sort;

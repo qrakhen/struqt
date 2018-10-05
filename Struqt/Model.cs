@@ -61,7 +61,7 @@ namespace Qrakhen.Struqt.Models
         protected Database __db {
             get {
                 var db = Database.getDatabase(GetType());
-                if (db == null) throw new ModelException("model " + GetType().Name + " not registered in any database.");
+                if (db == null) throw new ModelException("model " + __def.tableName + " not registered in any database.");
                 else return db;
             }
         }
@@ -86,6 +86,25 @@ namespace Qrakhen.Struqt.Models
         }
 
         /// <summary>
+        /// Selects the first object matching the provided Where-Clause
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="where"></param>
+        /// <returns></returns>
+        public static T getFirst<T>(Where where)
+        {
+            var mt = typeof(T);
+            var db = Database.getDatabase(mt);
+            return db.getFirst(
+                new Query.Select(getTableName(mt)).where(where),
+                delegate (RowReader reader) {
+                    var e = (Model)Activator.CreateInstance(mt);
+                    e.readRow(reader);
+                    return (T)(object)e;
+                });
+        }
+
+        /// <summary>
         /// Returns the object that matches this model's primary key with provided value.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -95,6 +114,10 @@ namespace Qrakhen.Struqt.Models
         {
             var mt = typeof(T);
             var def = Definition.get(mt);
+            if (def.cacheEnabled) {
+                var ce = Cache.get(mt, value);
+                if (ce != null) return (T)(object)ce;
+            }
             var db = Database.getDatabase(mt);
             var result = db.getFirst(
                 new Query.Select(getTableName(mt)).where(new Where.Equals(def.primary.column, value)),
@@ -103,7 +126,13 @@ namespace Qrakhen.Struqt.Models
                     e.readRow(reader);
                     return e;
                 });
+            if (def.cacheEnabled) Cache.set(mt, value, result);
             return (T)(object)result;
+        }
+
+        public static List<T> getChildren<T>(Type relation, Where where)
+        {
+            return select<T>(null);
         }
 
         /// <summary>
@@ -113,7 +142,7 @@ namespace Qrakhen.Struqt.Models
         /// </summary>
         public virtual void store()
         {
-            if ((int)readField(__def.primary.name) == 0 || readField(__def.primary.name) == null) {
+            if ((int)this[__pkyn] == 0 || this[__pkyn] == null) {
                 insert();
             } else {
                 if (__ard) update();
@@ -127,13 +156,13 @@ namespace Qrakhen.Struqt.Models
         protected virtual void insert()
         {
             var q = new Query.Insert(__tbl);
-            q.output(__def.primary.column);
+            q.output(__pkyc);
             foreach (var field in __def.fields.Values) {
                 if (field.primary) continue;
-                q.addValue(field.column, RowWriter.write(field.type, readField(field.name)));
+                q.addValue(field.column, RowWriter.write(field.type, this[field.name]));
             }
             var r = __db.scalar(q);
-            writeField(__pkyn, r);
+            this[__pkyn] = r;
         }
 
         /// <summary>
@@ -141,14 +170,10 @@ namespace Qrakhen.Struqt.Models
         /// </summary>
         protected virtual void update(bool overwritePrimaryKey = false)
         {
-            var q = new Query.Update(
-                __tbl, 
-                new Where.Equals(
-                    __def.primary.column, 
-                    readField(__def.primary.name)));
+            var q = new Query.Update(__tbl, new Where.Equals(__pkyc, this[__pkyn]));
             foreach (var field in __def.fields.Values) {
                 if (field.primary && !overwritePrimaryKey) continue;
-                q.addValue(field.column, RowWriter.write(field.type, readField(field.name)));
+                q.addValue(field.column, RowWriter.write(field.type, this[field.name]));
             }
         }
 
@@ -157,7 +182,7 @@ namespace Qrakhen.Struqt.Models
         /// </summary>
         public virtual void erase()
         {
-            var q = new Query.Delete(__tbl, new Where.Equals(__pkyc, readField(__pkyn)));
+            var q = new Query.Delete(__tbl, new Where.Equals(__pkyc, this[__pkyn]));
             __db.exec(q);
             if (__def.cacheEnabled) Cache.set(__t, __pkyn, null);
         }
@@ -172,15 +197,18 @@ namespace Qrakhen.Struqt.Models
             foreach (var field in __def.fields.Values) {
                 var f = __t.GetField(field.name);
                 if (f == null) throw new ModelDefinitionException("target type does not implement model field " + field.name);
-                writeField(f.Name, reader.read(field.column, field.type));
+                this[field.name] = reader.read(field.column, field.type);
                 var _ref = field.reference;
                 if (_ref != null && _ref.container != null) {
-                    /* probably the ugliest line of code i made yet */
-                    var _obj = typeof(Model).GetMethod("getByPrimary").MakeGenericMethod(_ref.model).Invoke(null, new object[] { readField(field.name), _ref.model });
-                    writeField(_ref.container, _obj);
+                    var _obj = typeof(Model)
+                        .GetMethod("getFirst")
+                        .MakeGenericMethod(_ref.model)
+                        .Invoke(null, new object[] {
+                            new Where.Equals(_ref.field, this[field.name])
+                        });
+                    this[_ref.container] = _obj;
                 }
             }
-            if (__def.cacheEnabled) Cache.set(__t, __pkyn, this);
         }
 
         /// <summary>
@@ -190,7 +218,7 @@ namespace Qrakhen.Struqt.Models
         /// <returns></returns>
         protected object readField(string name)
         {
-            return __t.GetField(name).GetValue(this);
+            return getField(name).GetValue(this);
         }
 
         /// <summary>
@@ -200,7 +228,14 @@ namespace Qrakhen.Struqt.Models
         /// <param name="value"></param>
         protected void writeField(string name, object value)
         {
-            __t.GetField(name).SetValue(this, value);
+            getField(name).SetValue(this, value);
+        }
+
+        private FieldInfo getField(string name)
+        {
+            var field = __t.GetField(name, BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field == null) field = __t.GetField(name);
+            return field;
         }
 
         /// <summary>
@@ -314,11 +349,17 @@ namespace Qrakhen.Struqt.Models
             public static List<Field> getModelFields(Type model)
             {
                 List<Field> fields = new List<Field>();
-                foreach (var field in model.GetFields()) {
-                    if (field.GetCustomAttribute<Column>() == null &&
-                        field.GetCustomAttribute<Primary>() == null) continue;
-                    fields.Add(new Field(field));
+                List<FieldInfo> temp = new List<FieldInfo>();
+                foreach (var field in model.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)) {
+                    if (field.GetCustomAttribute<Column>() == null && field.GetCustomAttribute<Primary>() == null) continue;
+                    temp.Add(field);
                 }
+                foreach (var field in model.GetFields()) {
+                    if (field.GetCustomAttribute<Column>() == null && field.GetCustomAttribute<Primary>() == null) continue;
+                    if (temp.Contains(field)) continue;
+                    temp.Add(field);
+                }
+                foreach (var field in temp) fields.Add(new Field(field));
                 return fields;
             }
         }
