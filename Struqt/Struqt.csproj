@@ -7,8 +7,8 @@
     <ProjectGuid>{FE44126F-2AE9-48D4-993D-636745ACA1A8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Struqt</RootNamespace>
-    <AssemblyName>Struqt</AssemblyName>
+    <RootNamespace>Qrakhen.Struqt</RootNamespace>
+    <AssemblyName>Qrakhen.Struqt</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
