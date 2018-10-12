@@ -267,10 +267,16 @@ namespace Qrakhen.Struqt.Models
         /// Meh.
         /// </summary>
         /// <param name="model"></param>
-        internal static void createTable(Type model)
+        public static void createTable(Type model)
         {
             var db = Database.getDatabase(model);
             db.exec(new Query.Create(Definition.get(model).tableName, model));
+        }
+
+        public static void dropTable(Type model)
+        {
+            var db = Database.getDatabase(model);
+            db.exec(new Query.Plain("DROP TABLE " + Definition.get(model).tableName));
         }
 
         internal protected sealed class Definition
