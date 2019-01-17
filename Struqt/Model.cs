@@ -158,7 +158,7 @@ namespace Qrakhen.Struqt.Models
             var t = getField(__pkyn).FieldType;
             bool d = false;
             if (t == typeof(string)) d = true;
-            else if ((int)this[__pkyn] == 0) d = true;
+            else if ((long)this[__pkyn] == 0) d = true;
             
             if (d) {
                 insert();
