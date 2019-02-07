@@ -13,7 +13,7 @@ namespace Qrakhen.Struqt.Models
         /// <summary>
         /// (Internal) table name
         /// </summary>
-        public string __tbl { get { return getTableName(GetType()); } }
+        protected string __tbl { get { return getTableName(GetType()); } }
 
         /// <summary>
         /// Model.Definition, stores all database-relevant data.
