@@ -142,10 +142,29 @@ namespace Qrakhen.Struqt.Models
             if (def.cacheEnabled) Cache.set(mt, value, result);
             return (T)(object)result;
         }
+        
+        /// <summary>
+        /// Not yet implemented.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="relation"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public static List<T> getChildren<T>(Type relation, Query query)
+        {
+            throw new NotImplementedException();
+        }
 
+        /// <summary>
+        /// Not yet implemented.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="relation"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public static List<T> getChildren<T>(Type relation, Where where)
         {
-            return null;
+            throw new NotImplementedException();
         }
 
         /// <summary>

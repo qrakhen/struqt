@@ -10,12 +10,21 @@ namespace Qrakhen.Struqt.Models
         private string connectionString;
         private string databaseName;
 
+        /// <summary>
+        /// Creates a new database with given name and connection string.
+        /// </summary>
+        /// <param name="databaseName">Database name, must be the exact name of the database as seen in SQL.</param>
+        /// <param name="connectionString"></param>
         public Database(string databaseName, string connectionString)
         {
             this.databaseName = databaseName;
             this.connectionString = connectionString;
         }
 
+        /// <summary>
+        /// Registers a model and, if not already existing, creates the according table.
+        /// </summary>
+        /// <param name="model"></param>
         public void register(Type model)
         {
             modelToDatabase.Add(model, this);
