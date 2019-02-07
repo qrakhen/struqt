@@ -195,6 +195,7 @@ namespace Qrakhen.Struqt.Models
                 if (field.primary && !overwritePrimaryKey) continue;
                 q.addValue(field.column, RowWriter.write(field.type, this[field.name]));
             }
+            __db.exec(q);
         }
 
         /// <summary>
