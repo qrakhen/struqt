@@ -50,6 +50,7 @@ namespace Qrakhen.Struqt.Models
             if (fieldType == typeof(int)) return readInt(column);
             if (fieldType == typeof(short)) return readShort(column);
             if (fieldType == typeof(float)) return readFloat(column);
+            if (fieldType == typeof(double)) return readDouble(column);
             if (fieldType == typeof(decimal)) return readDecimal(column);
             if (fieldType == typeof(string)) return readString(column);
             if (fieldType == typeof(Guid)) return new Guid(readString(column));
@@ -100,7 +101,15 @@ namespace Qrakhen.Struqt.Models
         public float readFloat(string column, float fallBack = 0f)
         {
             if (!dr.IsDBNull(dr.GetOrdinal(column)))
-                return dr.GetFloat(dr.GetOrdinal(column));
+                return (float) dr.GetDouble(dr.GetOrdinal(column));
+            else
+                return fallBack;
+        }
+
+        public double readDouble(string column, double fallBack = 0f)
+        {
+            if (!dr.IsDBNull(dr.GetOrdinal(column)))
+                return dr.GetDouble(dr.GetOrdinal(column));
             else
                 return fallBack;
         }
