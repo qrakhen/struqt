@@ -157,7 +157,9 @@ namespace Qrakhen.Struqt.Models
         {
             var t = getField(__pkyn).FieldType;
             bool d = false;
-            if (t == typeof(string)) d = true;
+            if (t == typeof(string) && 
+                ((string)this[__pkyn] == null || 
+                (string)this[__pkyn] == "")) d = true;
             else if ((long)this[__pkyn] == 0) d = true;
             
             if (d) {
