@@ -20,6 +20,11 @@ namespace Qrakhen.Struqt.Models
             if (entryCache.ContainsKey(model)) entryCache.Remove(model);
         }
 
+        public static void flush(Type model, object key)
+        {
+            if (entryCache.ContainsKey(model) && entryCache[model].ContainsKey(key)) entryCache[model].Remove(key);
+        }
+
         public static T get<T>(Type model, object primaryKey)
         {
             if (entryCache.ContainsKey(model)) {

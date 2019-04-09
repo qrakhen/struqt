@@ -285,6 +285,17 @@ namespace Qrakhen.Struqt.Models
             return field;
         }
 
+        public void setDirty()
+        {
+            Cache.flush(__t, this);
+        }
+
+        public static void clearCache<T>()
+            where T : Model
+        {
+            Cache.flush(typeof(T));
+        }
+
         /// <summary>
         /// Meh.
         /// </summary>
