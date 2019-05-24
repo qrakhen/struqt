@@ -134,7 +134,7 @@ namespace Qrakhen.Struqt.Models
         {
             try {
                 if (!dr.IsDBNull(dr.GetOrdinal(column)))
-                    return dr.GetFloat(dr.GetOrdinal(column));
+                    return dr.GetDouble(dr.GetOrdinal(column));
                 else
                     return fallBack;
             } catch (Exception e) {
