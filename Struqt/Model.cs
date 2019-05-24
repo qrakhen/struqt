@@ -179,7 +179,7 @@ namespace Qrakhen.Struqt.Models
             if (t == typeof(string) && 
                 ((string)this[__pkyn] == null || 
                 (string)this[__pkyn] == "")) d = true;
-            else if ((long)this[__pkyn] == 0) d = true;
+            else if ((int)this[__pkyn] == 0) d = true;
             
             if (d) {
                 insert();
