@@ -60,74 +60,110 @@ namespace Qrakhen.Struqt.Models
 
         public NDateTime readDateTime(string column)
         {
-            if (!dr.IsDBNull(dr.GetOrdinal(column)))
-                return new NDateTime(dr.GetDateTime(dr.GetOrdinal(column)));
-            else
+            try {
+                if (!dr.IsDBNull(dr.GetOrdinal(column)))
+                    return new NDateTime(dr.GetDateTime(dr.GetOrdinal(column)));
+                else
+                    return null;
+            } catch (Exception e) {
                 return null;
+            }
         }
 
         public bool readBool(string column, bool fallBack = false)
         {
-            if (!dr.IsDBNull(dr.GetOrdinal(column)))
-                return dr.GetBoolean(dr.GetOrdinal(column));
-            else
+            try {
+                if (!dr.IsDBNull(dr.GetOrdinal(column)))
+                    return dr.GetBoolean(dr.GetOrdinal(column));
+                else
+                    return fallBack;
+            } catch (Exception e) {
                 return fallBack;
+            }
         }
 
         public long readLong(string column, long fallBack = 0)
         {
-            if (!dr.IsDBNull(dr.GetOrdinal(column)))
-                return dr.GetInt64(dr.GetOrdinal(column));
-            else
+            try {
+                if (!dr.IsDBNull(dr.GetOrdinal(column)))
+                    return dr.GetInt64(dr.GetOrdinal(column));
+                else
+                    return fallBack;
+            } catch (Exception e) {
                 return fallBack;
+            }
         }
 
         public int readInt(string column, int fallBack = 0)
         {
-            if (!dr.IsDBNull(dr.GetOrdinal(column)))
-                return dr.GetInt32(dr.GetOrdinal(column));
-            else
+            try {
+                if (!dr.IsDBNull(dr.GetOrdinal(column)))
+                    return dr.GetInt32(dr.GetOrdinal(column));
+                else
+                    return fallBack;
+            } catch (Exception e) {
                 return fallBack;
+            }
         }
 
         public int readShort(string column, int fallBack = 0)
         {
-            if (!dr.IsDBNull(dr.GetOrdinal(column)))
-                return dr.GetInt16(dr.GetOrdinal(column));
-            else
+            try {
+                if (!dr.IsDBNull(dr.GetOrdinal(column)))
+                    return dr.GetInt16(dr.GetOrdinal(column));
+                else
+                    return fallBack;
+            } catch (Exception e) {
                 return fallBack;
+            }
         }
 
         public float readFloat(string column, float fallBack = 0f)
         {
-            if (!dr.IsDBNull(dr.GetOrdinal(column)))
-                return (float) dr.GetDouble(dr.GetOrdinal(column));
-            else
+            try {
+                if (!dr.IsDBNull(dr.GetOrdinal(column)))
+                    return (float) dr.GetDouble(dr.GetOrdinal(column));
+                else
+                    return fallBack;
+            } catch (Exception e) {
                 return fallBack;
+            }
         }
 
         public double readDouble(string column, double fallBack = 0f)
         {
-            if (!dr.IsDBNull(dr.GetOrdinal(column)))
-                return dr.GetDouble(dr.GetOrdinal(column));
-            else
+            try {
+                if (!dr.IsDBNull(dr.GetOrdinal(column)))
+                    return dr.GetFloat(dr.GetOrdinal(column));
+                else
+                    return fallBack;
+            } catch (Exception e) {
                 return fallBack;
+            }
         }
 
         public decimal readDecimal(string column, decimal fallBack = 0m)
         {
-            if (!dr.IsDBNull(dr.GetOrdinal(column)))
-                return dr.GetDecimal(dr.GetOrdinal(column));
-            else
+            try {
+                if (!dr.IsDBNull(dr.GetOrdinal(column)))
+                    return dr.GetDecimal(dr.GetOrdinal(column));
+                else
+                    return fallBack;
+            } catch (Exception e) {
                 return fallBack;
+            }
         }
 
         public string readString(string column, string fallBack = null)
         {
-            if (!dr.IsDBNull(dr.GetOrdinal(column)))
-                return dr.GetString(dr.GetOrdinal(column));
-            else
+            try {
+                if (!dr.IsDBNull(dr.GetOrdinal(column)))
+                    return dr.GetString(dr.GetOrdinal(column));
+                else
+                    return fallBack;
+            } catch (Exception e) {
                 return fallBack;
+            }
         }
     }
 }
