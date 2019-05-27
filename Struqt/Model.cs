@@ -175,18 +175,31 @@ namespace Qrakhen.Struqt.Models
         public virtual void store()
         {
             var t = getField(__pkyn).FieldType;
-            bool d = false;
-            if (t == typeof(string) && 
-                ((string)this[__pkyn] == null || 
-                (string)this[__pkyn] == "")) d = true;
-            else if ((int)this[__pkyn] == 0) d = true;
-            
+            bool d = isNullOrDefault(this[__pkyn]);
+
             if (d) {
                 insert();
             } else {
                 if (__ard) update();
                 else throw new ModelReadWriteException(this, "you can not update an entry that received its primary key before first write. if you want to do this, remove [AutoIncrement] from the model definition and manage ID counting externaly.");
             }
+        }
+
+        private static bool isNullOrDefault<T>(T value)
+        {
+            if (value == null) return true;
+            if (Equals(value, default(T))) return true;
+
+            Type methodType = typeof(T);
+            if (Nullable.GetUnderlyingType(methodType) != null) return false;
+
+            Type argumentType = value.GetType();
+            if (argumentType.IsValueType && argumentType != methodType) {
+                object obj = Activator.CreateInstance(value.GetType());
+                return obj.Equals(value);
+            }
+
+            return false;
         }
 
         /// <summary>
