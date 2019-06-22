@@ -34,14 +34,13 @@ namespace Qrakhen.Struqt.Models
 
             public override string print()
             {
-                string r = column + " IS NULL ";
-                return r + base.print();
+                throw new System.Exception("SubQuery not yet implemented");
             }
         }
 
         public class IsNull : Where
         {
-            public IsNull(string column, object value) : base(column, value) { }
+            public IsNull(string column) : base(column, null) { }
 
             public override string print()
             {
@@ -52,7 +51,7 @@ namespace Qrakhen.Struqt.Models
 
         public class NotNull : Where
         {
-            public NotNull(string column, object value) : base(column, value) { }
+            public NotNull(string column) : base(column, null) { }
 
             public override string print()
             {
