@@ -53,7 +53,10 @@ namespace Qrakhen.Struqt.Models
             List<T> result = new List<T>();
             using (var sql = connect()) {
                 using (var cmd = new SqlCommand(useDatabase(query.build()), sql)) {
-                    foreach (var a in query.arguments) cmd.Parameters.AddWithValue(a.Key, a.Value);
+                    foreach (var a in query.arguments)
+                        if (a.Value != null)
+                            cmd.Parameters.AddWithValue(a.Key, a.Value);
+
                     sql.Open();
                     using (var dr = cmd.ExecuteReader()) {
                         var reader = new RowReader(dr);
@@ -118,7 +121,9 @@ namespace Qrakhen.Struqt.Models
             int count = 0;
             using (var sql = connect()) {
                 using (var cmd = new SqlCommand(useDatabase(query.build()), sql)) {
-                    foreach (var a in query.arguments) cmd.Parameters.AddWithValue(a.Key, a.Value);
+                    foreach (var a in query.arguments)
+                        if (a.Value != null)
+                            cmd.Parameters.AddWithValue(a.Key, a.Value);
                     sql.Open();
                     using (var dr = cmd.ExecuteReader()) {
                         if (dr.Read()) count = dr.GetInt32(dr.GetOrdinal("count"));
@@ -138,7 +143,9 @@ namespace Qrakhen.Struqt.Models
             int rows = 0;
             using (var sql = connect()) {
                 using (var cmd = new SqlCommand(useDatabase(query.build()), sql)) {
-                    foreach (var a in query.arguments) cmd.Parameters.AddWithValue(a.Key, a.Value);
+                    foreach (var a in query.arguments)
+                        if (a.Value != null)
+                            cmd.Parameters.AddWithValue(a.Key, a.Value);
                     sql.Open();
                     rows = cmd.ExecuteNonQuery();
                 }
@@ -157,7 +164,9 @@ namespace Qrakhen.Struqt.Models
             object result = null;
             using (var sql = connect()) {
                 using (var cmd = new SqlCommand(useDatabase(query.build()), sql)) {
-                    foreach (var a in query.arguments) cmd.Parameters.AddWithValue(a.Key, a.Value);
+                    foreach (var a in query.arguments)
+                        if (a.Value != null)
+                            cmd.Parameters.AddWithValue(a.Key, a.Value);
                     sql.Open();
                     result = cmd.ExecuteScalar();
                 }
